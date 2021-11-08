@@ -2,37 +2,44 @@ import React, { Component } from 'react';
 import './App.css';
 import EmployeesList from './components/employees-list/employees-list';
 
+import firebase from './firebase';
+
+import {
+  doc,
+  setDoc,
+  getDocs,
+  getFirestore,
+  collection,
+  deleteDoc,
+  Timestamp,
+  writeBatch
+} from 'firebase/firestore';
+
 export default class App extends Component {
   currentMaxId = 2;
+  db = getFirestore(firebase);
   fullNameRef = React.createRef();
   salaryRef = React.createRef();
   hireDateRef = React.createRef();
   outsourceRef = React.createRef();
   formRef = React.createRef();
   state = {
-    employees: [
-      {
-        id: 1,
-        fullName: 'Jeremy Oshie',
-        hireDate: '2011-05-06',
-        salary: 5456465,
-        isOutsource: false
-      },
-      {
-        id: 2,
-        fullName: 'Lalalala',
-        hireDate: '2010-08-06',
-        salary: 5456461235,
-        isOutsource: true
-      }
-    ],
+    employees: [],
     editingMode: false,
     currentItemId: 0,
-    datas: []
+    deletedIDs: []
   };
 
   createEmployee = ({ fullName, hireDate, salary, isOutsource }) => {
     return { fullName, hireDate, salary, isOutsource, id: ++this.currentMaxId };
+  };
+  createEmployeeForDatabase = ({ fullName, hireDate, salary, isOutsource }) => {
+    return {
+      fullName,
+      hireDate: Timestamp.fromMillis(new Date(hireDate).getTime()),
+      salary,
+      isOutsource
+    };
   };
 
   handleSubmit = (e) => {
@@ -48,6 +55,7 @@ export default class App extends Component {
     } else {
       this.addEmployee(employeeData);
     }
+    this.formRef.current.reset();
   };
 
   addEmployee = (employeeData) => {
@@ -85,7 +93,6 @@ export default class App extends Component {
         ...employees.slice(index + 1)
       ];
       // console.log(newArray);
-      this.formRef.current.reset();
       return { employees: newArray, editingMode: false, currentItemId: 0 };
     });
   };
@@ -102,69 +109,61 @@ export default class App extends Component {
   // };
 
   deleteAnItem = (id) => {
-    this.setState(({ employees }) => {
+    this.setState(({ employees, deletedIDs }) => {
       const anArr = employees.filter(function (el) {
         return el.id !== id;
       });
       this.formRef.current.reset();
-      return { employees: anArr, currentItemId: 0, editingMode: false };
-    });
-  };
-
-  fSubmit = (e) => {
-    e.preventDefault();
-    console.log('try');
-
-    let datas = this.state.datas;
-    let name = this.refs.name.value;
-    let address = this.refs.address.value;
-
-    if (this.state.act === 0) {
-      //new
-      let data = {
-        name,
-        address
+      return {
+        employees: anArr,
+        currentItemId: 0,
+        editingMode: false,
+        deletedIDs: [...deletedIDs, id]
       };
-      datas.push(data);
-    } else {
-      //update
-      let index = this.state.index;
-      datas[index].name = name;
-      datas[index].address = address;
-    }
-
-    this.setState({
-      datas: datas,
-      act: 0
     });
-
-    this.refs.myForm.reset();
-    this.refs.name.focus();
   };
 
-  fRemove = (i) => {
-    let datas = this.state.employees;
-    datas.splice(i, 1);
-    this.setState({
-      datas: datas
-    });
-
-    this.refs.myForm.reset();
-    this.refs.name.focus();
+  saveToDatabase = () => {
+    const batch = writeBatch(this.db);
+    const postData = async () => {
+      this.state.employees.forEach((item) => {
+        const firebaseObject = this.createEmployeeForDatabase(item);
+        console.log(item.id);
+        console.log(firebaseObject);
+        batch.set(doc(this.db, 'employees', '' + item.id), firebaseObject);
+      });
+      if (this.state.deletedIDs.length !== 0) {
+        console.log(this.state.deletedIDs);
+        this.state.deletedIDs.forEach((id) =>
+          batch.delete(doc(this.db, 'employees', '' + id))
+        );
+      }
+      await batch.commit();
+    };
+    postData().then(() => console.log('saved'));
   };
 
-  fEdit = (i) => {
-    let data = this.state.datas[i];
-    this.refs.name.value = data.name;
-    this.refs.address.value = data.address;
-
-    this.setState({
-      act: 1,
-      index: i
-    });
-
-    this.refs.name.focus();
-  };
+  componentDidMount() {
+    // this.setState({ loading: true });
+    const fetchData = async () => {
+      const snapshot = await getDocs(collection(this.db, 'employees'));
+      console.log(snapshot);
+      const employees = snapshot.docs.map((doc) => {
+        this.currentMaxId = Math.max(this.currentMaxId, parseInt(doc.id, 10));
+        const date = doc.data().hireDate.toDate();
+        return {
+          ...doc.data(),
+          hireDate: `${date.getFullYear()}-${
+            date.getMonth() + 1
+          }-${date.getDate()}`,
+          id: parseInt(doc.id, 10)
+        };
+      });
+      console.log(employees);
+      this.setState({ employees: employees });
+    };
+    fetchData();
+  }
 
   render() {
     let { employees, editingMode } = this.state;
@@ -196,8 +195,18 @@ export default class App extends Component {
               onChange={this.onStatusChange}
             />
           </label>
-          <button onClick={(e) => this.handleSubmit(e)} className="myButton">
+          <button
+            onClick={(e) => this.handleSubmit(e)}
+            className="myButton submitButton"
+          >
             {`${editingMode ? 'Save changes' : 'Add employee'}`}
+          </button>
+          <button
+            type="button"
+            onClick={this.saveToDatabase}
+            className="myButton saveToCloudButton"
+          >
+            {'Save to cloud'}
           </button>
         </form>
         <EmployeesList

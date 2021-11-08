@@ -16,10 +16,18 @@ export default class ListItem extends Component {
           } an outsource worker`}</span>
         </div>
         <div className="list-item-buttons">
-          <button type="button" className="myListButton" onClick={onEdit}>
+          <button
+            type="button"
+            className="myListButton myListButton-edit"
+            onClick={onEdit}
+          >
             Edit
           </button>
-          <button type="button" className="myListButton" onClick={onDelete}>
+          <button
+            type="button"
+            className="myListButton myListButton-delete"
+            onClick={onDelete}
+          >
             Delete
           </button>
         </div>

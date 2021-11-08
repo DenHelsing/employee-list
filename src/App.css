@@ -61,25 +61,37 @@ ul{
 
 .myButton{
   width: 100%;
-  background-color: #00b894;
   color: white;
   padding: 14px 20px;
   margin: 8px 0;
   border: none;
   border-radius: 4px;
   cursor: pointer;
+  transition: 0.5s;
+  -webkit-transition: 0.5s;
+  -moz-transition: 0.5s;
+  -ms-transition: 0.5s;
+  -o-transition: 0.5s;
+}
+
+.submitButton{
+  background-color: #00b894;
+
+}
+.submitButton:hover{
+  background-color: #1a865d;
+
+}
+
+.saveToCloudButton{
+  background-color: rgb(128, 142, 204);
+}
+
+.saveToCloudButton:hover{
+  background-color: rgb(65, 86, 179);
 }
 
 .myList{
   list-style: none;
-}
-
-.myListButton{
-  display: inline-block;
-  height: auto;
-  width: auto;
-  border-radius: 7px;
-  border: 2px solid rgb(128, 142, 204);
-  margin: 3px 5px;
 }
 
