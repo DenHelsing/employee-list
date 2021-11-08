@@ -1,0 +1,23 @@
+.list-item{
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
+  margin-bottom: 10px;
+  border: 2px solid rgb(128, 142, 204);
+  border-radius: 20px;
+  padding: 5px 20px;
+  -webkit-border-radius: 20px;
+  -moz-border-radius: 20px;
+  -ms-border-radius: 20px;
+  -o-border-radius: 20px;
+}
+
+.list-item-labels{
+  display: flex;
+  flex-wrap: wrap;
+  flex-direction: column;
+}
+
+.list-item-label{
+  margin: 5px 0;
+}

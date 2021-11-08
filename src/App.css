@@ -1,0 +1,85 @@
+body{
+  padding: 20px;
+  background-color: #37769b98;
+}
+
+h2{
+  text-align: center;
+}
+
+ul{
+  list-style-type: none;
+  margin: 0;
+  padding: 0;
+}
+
+.App {
+  /* background-color: #849ec5ab; */
+  border-radius: 3%;
+  padding: 30px;
+  margin: auto;
+  width: 60%;
+  -webkit-border-radius: 3%;
+  -moz-border-radius: 3%;
+  -ms-border-radius: 3%;
+  -o-border-radius: 3%;
+}
+
+.inputForm{
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  /* width: 100%; */
+  margin: 0 auto;
+  background-color: #dfe6e9;
+  border-radius: 5px;
+  padding: 20px;
+}
+.inputForm label{
+  width: 100%;
+ display: flex;
+ justify-content: center;
+ align-items: center;
+}
+
+.formField{
+  width: 100%;
+  padding: 12px 20px;
+  margin: 8px 0;
+  display: block;
+  border: 1px solid #ccc;
+  border-radius: 5px;
+  box-sizing: border-box;
+}
+
+.formField-narrow{
+  width: 49%;
+  /* margin: 0 10px; */
+}
+
+
+.myButton{
+  width: 100%;
+  background-color: #00b894;
+  color: white;
+  padding: 14px 20px;
+  margin: 8px 0;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+}
+
+.myList{
+  list-style: none;
+}
+
+.myListButton{
+  display: inline-block;
+  height: auto;
+  width: auto;
+  border-radius: 7px;
+  border: 2px solid rgb(128, 142, 204);
+  margin: 3px 5px;
+}
+
